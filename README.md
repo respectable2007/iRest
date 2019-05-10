@@ -1,2 +1,2 @@
 # iRest
-components js
+## Steps 步骤条
