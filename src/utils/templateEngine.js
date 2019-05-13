@@ -18,3 +18,6 @@
     code += 'return r.join("");';
     return new Function(code.replace(/[\r\t\n]/g, '')).apply(data);
 }
+module.exports = {
+  'templateEngine': templateEngine
+};

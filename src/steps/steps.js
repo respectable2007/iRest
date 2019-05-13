@@ -1,4 +1,4 @@
-import '../utils/templateEngine.js';
+import { templateEngine } from '../utils/templateEngine.js';
 (function(templateEngine) {
   "use strict";
   var _global;
