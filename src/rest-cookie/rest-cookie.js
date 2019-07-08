@@ -1,23 +1,26 @@
 /* rest-cookies */
-;(function(window, factory){
+;(function(window, document, factory){
   "use strict";
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = factory();
+    module.exports = factory(document);
   } else if(typeof define === 'function' && define.amd) {
-    define(factory());
+    define(factory(document));
   } else {
      var oldCookies = window.Cookies;
-     var api = window.Cookies = factory();
+     var api = window.Cookies = factory(document);
      api.noConflict = function() {
        window.Cookies = oldCookies;
        return api;
      }
 
   }
-})(window, function() {
-    var cached = {};
+})(window, document, function(document) {
     function Cookies() {
-
+      this.default = {
+        domain: true,
+        secure: true,
+        expires: true
+      }
     }
     /* get */
     Cookies.prototype.get = function(key) {
@@ -31,7 +34,7 @@
             cookie = parts.slice(1).join('='),
             name = parts[0];
 
-        if (key === name) {
+        if (this.default[key] && (key === name) || key === decodeURIComponent(name)) {
           result = cookie;
           break;
         } else {
@@ -39,12 +42,15 @@
         }
         
       }
-      return decodeURIComponent(result);
+      return this.default[key] ? result : decodeURIComponent(result);
     }
-    /* set */
-    Cookies.prototype.set = function(key, value) {
-        if(!key || !document.cookie) return;
-        var cookies = document.cookie.split('; '),
+    /* set 
+       如果是default内的，key，value必填
+       需要修改，请参考js-cookie
+    */
+    Cookies.prototype.set = function(key, value, attributes) {
+        if(!key) return;
+        var cookies = document.cookie ? document.cookie.split('; '):[],
             lens = cookies.length,
             i = 0;
         if(value instanceof Date) {
@@ -56,21 +62,28 @@
             value = result;
           }
         }catch(e){}
+        /* 存在修改 */
         for(i; i < lens; i++) {
           var parts = cookies[i].split('='),
-              cookie = parts.slice(1).join('=')
               name = parts[0];
-          if (key === name && cookie !== value) {
+          if ((this.default[key] && (key === name))
+              || (encodeURIComponent(key) === name)) {
             if(value !== '') {
-              cookies[i] = value;
+              cookies[i] = this.default[key]? key + '=' + value : encodeURIComponent(key) + '=' +encodeURIComponent(value);
             } else {
               cookies.splice(i, 1);
             }
             break;
           } 
         }
+        /* 不存在添加 */
+        if (i >= lens) {
+          var result = this.default[key] ? key + '=' + value : encodeURIComponent(key) + '=' +encodeURIComponent(value);
+          cookies.push(result)
+        }
+        debugger
+        document.cookie = '';
         document.cookie = cookies.join('; ');
-        debugger;
     }
     /* delete */
     Cookies.prototype.delete = function(key) {
