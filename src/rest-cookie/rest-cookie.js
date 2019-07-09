@@ -50,6 +50,9 @@
     */
     Cookies.prototype.set = function(key, value, attributes) {
         if(!key) return;
+        if(!value) {
+          document.cookie += '; expires=' + 'Thu, 01 Jan 1970 00:00:00 GMT'
+        }
         var cookies = document.cookie ? document.cookie.split('; '):[],
             lens = cookies.length,
             i = 0;
@@ -68,11 +71,7 @@
               name = parts[0];
           if ((this.default[key] && (key === name))
               || (encodeURIComponent(key) === name)) {
-            if(value !== '') {
               cookies[i] = this.default[key]? key + '=' + value : encodeURIComponent(key) + '=' +encodeURIComponent(value);
-            } else {
-              cookies.splice(i, 1);
-            }
             break;
           } 
         }
@@ -81,7 +80,6 @@
           var result = this.default[key] ? key + '=' + value : encodeURIComponent(key) + '=' +encodeURIComponent(value);
           cookies.push(result)
         }
-        debugger
         document.cookie = '';
         document.cookie = cookies.join('; ');
     }
