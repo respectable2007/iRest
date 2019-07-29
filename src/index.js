@@ -1,7 +1,7 @@
 /* 兼容性 */
 import '../src/compate/index.js'
 /* 样式 */
-import '../src/styles/index.css'
+import '../src/styles/index.scss'
 /* 步骤条实例 */
 import '../src/samples/steps.js'
 /* rest-cookies 未完待续*/
