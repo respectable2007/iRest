@@ -4,7 +4,8 @@
   "description": "a js component library",
   "main": "index.js",
   "scripts": {
-    "start": "webpack-dev-server --open --config build/webpack.dev.config.js"
+    "start": "webpack-dev-server --open --config build/webpack.dev.config.js",
+    "build": "webpack --config build/webpack.production.config.js"
   },
   "repository": {
     "type": "git",
