@@ -1,5 +1,5 @@
 import '../steps/steps.js';
-((window,document) => {
+((document) => {
   let div = document.createElement('div');
   div.innerHTML = '<div><button id="statusChange">下一步</button></div><script type="text/template" id="steps"><div class="steps"><ul><li >等待</li><li>面试中</li><li>面试结束</li></ul></div></script>';
   document.body.appendChild(div);
@@ -19,4 +19,4 @@ import '../steps/steps.js';
       lis[data.active].className = 'active';
     }
   },false)
-})(window,document)
+})(document)

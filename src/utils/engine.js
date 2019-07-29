@@ -1,5 +1,9 @@
- // 自定义模板引擎
- function templateEngine(html, data) {
+ /**
+  * 自定义模板引擎
+  * @param {*} html 
+  * @param {*} data 
+  */
+ export function engine(html, data) {
     var re = /<%([^%>]+)?%>/g,
         reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g,
         code = 'var r=[];\n',
@@ -18,6 +22,3 @@
     code += 'return r.join("");';
     return new Function(code.replace(/[\r\t\n]/g, '')).apply(data);
 }
-module.exports = {
-  'templateEngine': templateEngine
-};
