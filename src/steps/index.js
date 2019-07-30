@@ -1,7 +1,6 @@
 import { engine, extend } from '../utils/index.js';
 (function(engine, extend) {
   "use strict";
-  var _global;
   function Steps(opt) {
     this._init(opt)
   }
@@ -50,7 +49,7 @@ import { engine, extend } from '../utils/index.js';
       },false)
     }
   }
-  _global = (function(){
+  var _global = (function(){
     return this || (0, eval)('this');
   }());
   if(typeof module !== 'undefined' && module.exports) {
