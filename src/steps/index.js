@@ -10,18 +10,27 @@ import { engine, extend } from '../utils/index.js';
       var defaults = {
         active: 0,
         tmpId: null,
-        activeCls: 'step-active'
+        activeCls: 'step-active',
+        template: '<script type="text/template" id="steps"><div class="steps"><ul></ul><div><button id="statusChange">下一步</button></div></div></script>'
       }
       this.defaults = extend(defaults, opt, true);
-      this.tpl = this._parseTpl(this.defaults.tmpId);
+      this._initTemplate();
+      this.tpl = engine(this.defaults.template.trim(), this.defaults);
       this.dom = this._parseToDom(this.tpl);
       document.body.appendChild(this.dom[0]);
       this._bindEvent();
     },
-    _parseTpl:function(id) {
-      var data = this.defaults;
-      var tplStr = document.getElementById(id).innerHTML.trim();
-      return engine(tplStr, data);
+    _initTemplate: function() {
+      var lens = this.defaults.titles.length,
+          ts = this.defaults.titles,
+          t = this.defaults.template,
+          s = '<ul>';
+      for(var i = 0; i < lens; i++) {
+        s += '<li>' + ts[i] + '</li>'
+      }
+      s+='</ul>';
+      t = t.replace(/<ul><\/ul>/gi, s);
+      this.defaults.template = t;
     },
     _parseToDom:function(str) {
       var div = document.createElement('div');

@@ -4,6 +4,7 @@
   * @param {*} data 
   */
  export function engine(html, data) {
+    html = html.replace(/(<script\b[^<]*>)|(<\/script>)/gi, '');
     var re = /<%([^%>]+)?%>/g,
         reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g,
         code = 'var r=[];\n',
