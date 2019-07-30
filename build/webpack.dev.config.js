@@ -5,6 +5,7 @@ module.exports = merge(base,{
   devServer: {
     contentBase: './dist',
     host: 'localhost',
-    port: '9191'
+    port: '9191',
+    overlay: true
   }
 })

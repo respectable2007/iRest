@@ -10,7 +10,8 @@ import { engine, extend } from '../utils/index.js';
     _init: function(opt) {
       var defaults = {
         active: 0,
-        tmpId: null
+        tmpId: null,
+        activeCls: 'step-active'
       }
       this.defaults = extend(defaults, opt, true);
       this.tpl = this._parseTpl(this.defaults.tmpId);
@@ -27,8 +28,11 @@ import { engine, extend } from '../utils/index.js';
       if(typeof str === 'string') {
         div.innerHTML = str;
       }
-      div.getElementsByTagName('li')[this.defaults.active].className = 'active';
+      div.getElementsByTagName('li')[this.defaults.active].className = this.defaults.activeCls;
       return div.childNodes;
+    },
+    next:function(){
+      
     }
   }
   _global = (function(){

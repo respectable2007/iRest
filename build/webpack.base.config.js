@@ -11,6 +11,17 @@ module.exports = {
   module: {
     rules: [{
       test: /\.js$/,
+      loader: 'eslint-loader',
+      enforce: 'pre',
+      exclude:/node_modules/,
+      include:[path.resolve(__dirname, 'src')],
+      options: {
+        formatter: require('eslint-friendly-formatter'),
+        emitWarning: true
+      }
+    },{
+      test: /\.js$/,
+      exclude:/node_modules/,
       use: ['babel-loader']
     },{
       test:/\.scss$/,
