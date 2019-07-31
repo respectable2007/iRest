@@ -9,7 +9,7 @@ import { engine, extend } from '../utils/index.js';
     _init: function(opt) {
       var defaults = {
         active: 0,
-        tmpId: null,
+        tmpId: 'steps',
         activeCls: 'step-active',
         template: '<script type="text/template" id="steps"><div class="steps"><ul></ul><div><button id="statusChange">下一步</button></div></div></script>'
       }
@@ -29,7 +29,7 @@ import { engine, extend } from '../utils/index.js';
         s += '<li>' + ts[i] + '</li>'
       }
       s+='</ul>';
-      t = t.replace(/<ul><\/ul>/gi, s);
+      t = t.replace(/<ul>.*<\/ul>/gi, s);
       this.defaults.template = t;
     },
     _parseToDom:function(str) {

@@ -1,4 +1,5 @@
 /* 兼容性 */
+import 'normalize.css'
 import '../src/compate/index.js'
 /* 样式 */
 import '../src/styles/index.scss'
