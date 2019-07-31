@@ -28,7 +28,7 @@ module.exports = {
       loader:'style-loader!css-loader!sass-loader'
     },{
       test:/\.css$/,
-      use: ['css-loader']
+      use: ['style-loader','css-loader']
     }]
   },
   plugins: [

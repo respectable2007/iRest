@@ -1,0 +1,21 @@
+.ir-dropdown{
+  position: relative;
+  .ir-dropdown-header{
+    position: absolute;
+  }
+  .ir-dropdown-list{
+    position: absolute;
+    top: 24px;
+    text-align: center;
+    ul {
+      width: 70px;
+      margin: 0;
+      padding: 0;
+      li {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+    }
+  }
+}

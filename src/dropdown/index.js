@@ -7,17 +7,19 @@ import {engine, extend} from '../utils'
   DropDown.prototype = {
     constructor: DropDown,
     default: {
+      trigger: 'hover',
       template: '<script type="text/template" id="dropdown"><div class="ir-dropdown">'
       +'<div class="ir-dropdown-header">下拉菜单</div>'
-      +'<div class="ir-dropdown-list"><ul>条目</ul></div>'
+      +'<div class="ir-dropdown-list hide"><ul>条目</ul></div>'
       +'</div></script>'
     },
     _init: function(opt) {
-      this.default = extend(this.default, opt);
+      this.default = extend(this.default, opt, true);
       this._initTemplate();
       this.tpl = engine(this.default.template.trim(), this.default);
       this.dom = this._parseToDom(this.tpl);
       document.body.appendChild(this.dom);
+      this._initEvent();
     },
     _initTemplate: function() {
       let {header, item, template} = this.default,
@@ -41,6 +43,36 @@ import {engine, extend} from '../utils'
         div.innerHTML = str;
       }
       return div.childNodes[0];
+    },
+    _initEvent: function() {
+      let dropdown = document.getElementsByClassName('ir-dropdown')[0],
+          header = document.getElementsByClassName('ir-dropdown-header')[0],
+          items = document.getElementsByClassName('ir-dropdown-list')[0],
+          event = this.default.trigger === 'hover' ? 'mouseover' : 'click';
+      if (this.default.trigger === 'hover') {
+        dropdown.addEventListener(event, function() {
+          items.className = items.className.replace(/\shide/gi, '');
+        })
+        dropdown.addEventListener('mouseout', function(e) {
+          e.stopPropagation();
+          items.className += ' hide';
+        })
+      } else {
+        header.addEventListener(event, function(e) {
+          e.stopPropagation();
+          if (items.className.indexOf('hide') < 0) {
+            items.className += ' hide';
+          } else {
+            items.className = items.className.replace(/\shide/gi, '');
+          }
+        }, false)
+        header.addEventListener('DOMFocusOut', function(e) {
+          e.stopPropagation();
+          if (items.className.indexOf('hide') < 0) {
+            items.className += ' hide';
+          }
+        }, false)
+      }
     }
   }
   if(typeof module !='undefined' && module.exports) {

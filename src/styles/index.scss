@@ -1,1 +1,8 @@
-@import './components/steps.scss'
+@import './components/steps.scss';
+@import './components/dropdown.scss';
+.hide {
+  visibility: hidden;
+}
+.show{
+  visibility: visible;
+}
