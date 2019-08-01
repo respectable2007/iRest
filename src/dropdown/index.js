@@ -1,7 +1,10 @@
 import {engine, extend, toRawType} from '../utils'
 ;(function(engine, extend, toRawType){
   "use strict";
+  let id = 0;
   function DropDown(opt) {
+    this.id = 'dropdown-menu-' + id;
+    id ++;
     this._init(opt);
   }
   DropDown.prototype = {
@@ -26,6 +29,8 @@ import {engine, extend, toRawType} from '../utils'
           lens = item.length,
           i = 0,
           iStr = '';
+      template = template.replace(/("ir-dropdown")/gi, '$1 aria-control="'+ this.id +'"');
+      template = template.replace(/(<ul)/gi, '$1 id="'+ this.id +'"');
       if (header) {
         template = template.replace(/下拉菜单/gi, header);
       }
@@ -44,33 +49,53 @@ import {engine, extend, toRawType} from '../utils'
       }
       return div.childNodes[0];
     },
+    vChange: function(t, value) {
+      let vc = this.default.visibleChange;
+      if(vc) {
+        vc.call(t, value);
+      }
+    },
     _initEvent: function() {
       let dropdown = document.getElementsByClassName('ir-dropdown')[0],
           header = document.getElementsByClassName('ir-dropdown-header')[0],
           items = document.getElementsByClassName('ir-dropdown-list')[0],
-          event = this.default.trigger === 'hover' ? 'mouseover' : 'click';
+          event = this.default.trigger === 'hover' ? 'mouseover' : 'click',
+          that = this;
       if (this.default.trigger === 'hover') {
-        dropdown.addEventListener(event, function() {
+        dropdown.addEventListener(event, function(e) {
+          e.stopPropagation();
           items.className = items.className.replace(/\shide/gi, '');
+          that.vChange(this, true);
         })
         dropdown.addEventListener('mouseout', function(e) {
           e.stopPropagation();
-          items.className += ' hide';
+          let rId = e.relatedTarget.parentElement ? 
+                    (e.relatedTarget.parentElement.id ? e.relatedTarget.parentElement.id : false)
+                    : false;
+          if(!rId || rId!== that.id) {
+            items.className += ' hide';
+            that.vChange(this, false);
+          }
         })
       } else {
         header.addEventListener(event, function(e) {
           e.stopPropagation();
+          let v = true;
           if (items.className.indexOf('hide') < 0) {
             items.className += ' hide';
+            v = false;
           } else {
             items.className = items.className.replace(/\shide/gi, '');
+            v = true;
           }
+          that.vChange(this, v);
         }, false)
         header.addEventListener('DOMFocusOut', function(e) {
           e.stopPropagation();
           if (items.className.indexOf('hide') < 0) {
             items.className += ' hide';
           }
+          that.vChange(this, v);
         }, false)
       }
       if(this.default.command) {
