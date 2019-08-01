@@ -1,5 +1,5 @@
-import {engine, extend} from '../utils'
-;(function(engine, extend){
+import {engine, extend, toRawType} from '../utils'
+;(function(engine, extend, toRawType){
   "use strict";
   function DropDown(opt) {
     this._init(opt);
@@ -31,7 +31,7 @@ import {engine, extend} from '../utils'
       }
       if (lens > 0) {
         for(i; i < lens; i++) {
-          iStr += '<li>' + item[i] + '</li>'
+          iStr += '<li command='+item[i].command+'>' + item[i].label + '</li>'
         }
       }
       template = template.replace(/条目/gi, iStr);
@@ -73,6 +73,17 @@ import {engine, extend} from '../utils'
           }
         }, false)
       }
+      if(this.default.command) {
+        let hander = this.default.command;
+        if (toRawType(hander) === 'Function') {
+          let items = document.getElementsByClassName('ir-dropdown-list')[0],
+              ul = items.getElementsByTagName('ul')[0];
+          //事件委托
+          ul.addEventListener('click', function(e) {
+            hander.call(this, e.target.getAttribute('command'));
+          })
+        }
+      }
     }
   }
   if(typeof module !='undefined' && module.exports) {
@@ -87,4 +98,4 @@ import {engine, extend} from '../utils'
     }());
     !('DropDown' in global) && (global.DropDown = DropDown);
   }
-}(engine,extend))
+}(engine,extend,toRawType))

@@ -13,3 +13,7 @@ export function extend(o,n,override) {
     }
     return o;
 }
+const toString = Object.prototype.toString;
+export function toRawType(value) {
+  return toString.call(value).slice(8, -1);
+}
