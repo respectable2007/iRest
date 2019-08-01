@@ -1,6 +1,7 @@
 import {engine, extend, toRawType} from '../utils'
 ;(function(engine, extend, toRawType){
   "use strict";
+  //唯一标识符
   let id = 0;
   function DropDown(opt) {
     this.id = 'dropdown-menu-' + id;
@@ -14,7 +15,8 @@ import {engine, extend, toRawType} from '../utils'
       template: '<script type="text/template" id="dropdown"><div class="ir-dropdown">'
       +'<div class="ir-dropdown-header">下拉菜单</div>'
       +'<div class="ir-dropdown-list hide"><ul>条目</ul></div>'
-      +'</div></script>'
+      +'</div></script>',
+      show: false
     },
     _init: function(opt) {
       this.default = extend(this.default, opt, true);
@@ -24,13 +26,16 @@ import {engine, extend, toRawType} from '../utils'
       document.body.appendChild(this.dom);
       this._initEvent();
     },
+    //初始化模板
     _initTemplate: function() {
       let {header, item, template} = this.default,
           lens = item.length,
           i = 0,
-          iStr = '';
-      template = template.replace(/("ir-dropdown")/gi, '$1 aria-control="'+ this.id +'"');
-      template = template.replace(/(<ul)/gi, '$1 id="'+ this.id +'"');
+          iStr = '',
+          that = this;
+      template = template.replace(/(ir-dropdown")|(<ul)/gi, function(...m) {
+          return m[0] + (m[0].indexOf("ir") > 0 ?' aria-control="'+ that.id +'"' : ' id="'+ that.id +'"');
+      });
       if (header) {
         template = template.replace(/下拉菜单/gi, header);
       }
@@ -42,6 +47,7 @@ import {engine, extend, toRawType} from '../utils'
       template = template.replace(/条目/gi, iStr);
       this.default.template = template;
     },
+    //string to Dom
     _parseToDom: function(str) {
       let div = document.createElement('div');
       if(typeof str === 'string') {
@@ -49,23 +55,29 @@ import {engine, extend, toRawType} from '../utils'
       }
       return div.childNodes[0];
     },
+    //下拉框出现/隐藏触发
     vChange: function(t, value) {
       let vc = this.default.visibleChange;
       if(vc) {
         vc.call(t, value);
       }
     },
+    //初始化事件
     _initEvent: function() {
       let dropdown = document.getElementsByClassName('ir-dropdown')[0],
           header = document.getElementsByClassName('ir-dropdown-header')[0],
           items = document.getElementsByClassName('ir-dropdown-list')[0],
           event = this.default.trigger === 'hover' ? 'mouseover' : 'click',
           that = this;
+      //trigger-hover
       if (this.default.trigger === 'hover') {
         dropdown.addEventListener(event, function(e) {
           e.stopPropagation();
-          items.className = items.className.replace(/\shide/gi, '');
-          that.vChange(this, true);
+          if (!that.default.show) {
+            items.className = items.className.replace(/\shide/gi, '');
+            that.vChange(this, true);
+            that.default.show = true;
+          }
         })
         dropdown.addEventListener('mouseout', function(e) {
           e.stopPropagation();
@@ -75,8 +87,10 @@ import {engine, extend, toRawType} from '../utils'
           if(!rId || rId!== that.id) {
             items.className += ' hide';
             that.vChange(this, false);
+            that.default.show = false;
           }
         })
+      //trigger-click
       } else {
         header.addEventListener(event, function(e) {
           e.stopPropagation();
@@ -98,6 +112,7 @@ import {engine, extend, toRawType} from '../utils'
           that.vChange(this, v);
         }, false)
       }
+      //commmand回调
       if(this.default.command) {
         let hander = this.default.command;
         if (toRawType(hander) === 'Function') {
@@ -111,6 +126,7 @@ import {engine, extend, toRawType} from '../utils'
       }
     }
   }
+  //模块导出
   if(typeof module !='undefined' && module.exports) {
     module.exports = DropDown;
   }else if(typeof define == 'function' && define.amd) {
