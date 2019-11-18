@@ -14,3 +14,35 @@ if(!('getElementsByClass' in HTMLElement)){
     };
     ((typeof HTMLDocument !== 'undefined') ? HTMLDocument : Document).prototype.getElementsByClass = HTMLElement.prototype.getElementsByClass;
 }
+export var addEvent = (function(){
+  if(window.addEventListener) {
+    return function(el,type,fn) {
+      var tmp = new Function(fn.toString())
+      fn = function(e) {
+        tmp.call(el,e)
+      }
+      el.addEventListener(type, fn, false)
+    }
+  }
+  if(window.attatchEvent) {
+    return function(el, type, fn) {
+      var tmp = new Function(fn.toString())
+      fn = function(e) {
+        tmp.call(el,e)
+      }
+      el.attatchEvent('on' + type , fn)
+    }
+  }
+})()
+export var removeEvent = (function(){
+  if(window.removeEventListener) {
+    return function(el,type,fn) {
+      el.removeEventListener(type,fn,false)
+    }
+  }
+  if(window.detachEvent) {
+    return function(el,type,fn) {
+      el.detachEvent('on' + type, fn)
+    }
+  }
+})()
