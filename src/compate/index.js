@@ -14,21 +14,24 @@ if(!('getElementsByClass' in HTMLElement)){
     };
     ((typeof HTMLDocument !== 'undefined') ? HTMLDocument : Document).prototype.getElementsByClass = HTMLElement.prototype.getElementsByClass;
 }
+/**
+ * 事件注册和注销兼容性
+ */
 export var addEvent = (function(){
   if(window.addEventListener) {
-    return function(el,type,fn) {
-      var tmp = new Function(fn.toString())
+    return function(context,el,type,fn) {
+      var tmp = new Function('e', fn.toString().replace(/(function\s*\(e\)\s*\{)|(\}\s*$)/g,''))
       fn = function(e) {
-        tmp.call(el,e)
+        tmp.call(context,e)
       }
       el.addEventListener(type, fn, false)
     }
   }
   if(window.attatchEvent) {
-    return function(el, type, fn) {
-      var tmp = new Function(fn.toString())
+    return function(context,el, type, fn) {
+      var tmp = new Function('e', fn.toString().replace(/(function\s*\(e\)\s*\{)|(\}\s*$)/g,''))
       fn = function(e) {
-        tmp.call(el,e)
+        tmp.call(context,e)
       }
       el.attatchEvent('on' + type , fn)
     }

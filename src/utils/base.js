@@ -14,7 +14,6 @@ function findIndex(arr, key) {
   }
   return -1
 }
-console.log(findIndex.name)
 /**
  * 事件机制（观察者[订阅-通知]）
  */
@@ -75,15 +74,25 @@ export var base = Event.extend({
   },
   //元素节点添加事件
   _delegateEvent(){
+    let events = this.events,
+        selector = '',
+        currentNode = this.get('_renderNodes'),
+        node = currentNode ? currentNode : this._opts.parentNode,
+        tag = node.tagName,
+        cldss =node.getAttribute('class')
+    if(tag !== 'body') {
+      selector = tag.toLowerCase() 
+                 + ( cldss ? '.' + cldss : '') 
+    }
     for(let e in events) {
-      let nodes = this.parentNode.querySelectorAll(e),
+      let nodes = document.querySelectorAll(selector + ' ' + e),
           lens = nodes.length,
           i = 0
       if(lens) {
         for(; i < lens; i++) {
           let types = events[e]
           for(let type in types) {
-            addEvent(nodes[i], type, types[type])
+            addEvent(this, nodes[i], type, types[type])
           }
         }
       }
@@ -113,9 +122,9 @@ export var base = Event.extend({
   //初始化
   init(options){
     this._opts = Object.assign(this._opts,options)
-    this._delegateEvent()
     //this.bind()
     this.setUp()
+    this._delegateEvent()
   },
   //获取配置参数
   get(key){
@@ -134,7 +143,7 @@ export var base = Event.extend({
     let data = this.get('_renderData')
     data[key] = value
     if(!this._opts.template) return
-    let str = this._parseTempate(this._opts.template, data),
+    let str = this._parseTempate(this._opts.template.trim(), data),
         div = document.createElement('div'),
         parentNode = this.get('parentNode') || document.body
     div.innerHTML = str
@@ -150,13 +159,13 @@ export var base = Event.extend({
   render(data){
     this.set('_renderData', data)
     if(! this._opts.template)  return
-    let str = this._parseTempate(this._opts.template, data),
+    let str = this._parseTempate(this._opts.template.trim(), data),
         div = document.createElement('div'),
         parentNode = this.get('parentNode') || document.body
     div.innerHTML = str
     let currentNode = div.childNodes[0]
     this.set('_renderNodes', currentNode)
-    parentNode.appendChild(div.currentNode)
+    parentNode.appendChild(currentNode)
     div = null
   },
   //销毁组件注册的监听者、事件和保存的已渲染节点

@@ -1,5 +1,8 @@
+/* 兼容性 */
+@import '../../node_modules/normalize.css/normalize.css';
 @import './components/steps.scss';
 @import './components/dropdown.scss';
+
 .hide {
   visibility: hidden;
 }

@@ -1,4 +1,4 @@
-import '../steps';
+import '../package/steps';
 (() => {
   new Steps( {
     active: 0,

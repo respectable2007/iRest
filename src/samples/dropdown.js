@@ -1,4 +1,4 @@
-import '../dropdown';
+import '../package/dropdown';
 (() => {
   new DropDown({
     header: '<button type="button">下拉菜单</button>',
