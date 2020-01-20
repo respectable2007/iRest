@@ -1,5 +1,7 @@
 import '../utils/class.js'
 import { addEvent, removeEvent } from '../compate'
+import { _ } from 'underscore'
+//模板引擎underscore
 /**
  * 检查数组项是否存在
  */
@@ -64,6 +66,7 @@ var Event = Class.extend({
 /**
  * 组件通用方法
  */
+
 export var base = Event.extend({
   //事件集合
   events: {},
@@ -87,41 +90,20 @@ export var base = Event.extend({
     for(let e in events) {
       let nodes = document.querySelectorAll(selector + ' ' + e),
           lens = nodes.length,
-          i = 0
+          i = 0;
       if(lens) {
         for(; i < lens; i++) {
           let types = events[e]
           for(let type in types) {
-            addEvent(this, nodes[i], type, types[type])
+            event.addEvent(this, nodes[i], type, types[type])
           }
         }
       }
     }
   },
-  //模板转化，合并标签和数据，返回字符串
-  _parseTempate(html, data) {
-    html = html.replace(/(<script\b[^<]*>)|(<\/script>)/gi, '');
-    var re = /<%([^%>]+)?%>/g,
-        reExp = /(^( )?(if|for|else|switch|case|break|{|}))(.*)?/g,
-        code = 'var r=[];\n',
-        cursor = 0;
-    var match;
-    var add = function(line, js) {
-        js ? (code += line.match(reExp) ? line + '\n' : 'r.push(' + line + ');\n') :
-            (code += line != '' ? 'r.push("' + line.replace(/"/g, '\\"') + '");\n' : '');
-        return add;
-    }
-    while (match = re.exec(html)) {
-        add(html.slice(cursor, match.index))(match[1], true);
-        cursor = match.index + match[0].length;
-    }
-    add(html.substr(cursor, html.length - cursor));
-    code += 'return r.join("");';
-    return new Function(code.replace(/[\r\t\n]/g, '')).apply(data);
-  },
   //初始化
   init(options){
-    this._opts = Object.assign(this._opts,options)
+    this._opts = assign(this._opts,options)
     //this.bind()
     this.setUp()
     this._delegateEvent()
@@ -140,17 +122,32 @@ export var base = Event.extend({
   },
   //单向绑定
   setChunkData(key, value) {
-    let data = this.get('_renderData')
-    data[key] = value
+    let data =  this.get('_renderData')
+    if(typeof key == 'string') {
+        data[key] = value
+    }
+    if(typeof key == 'object') {
+      for(var i in key) {
+        data[i] = key[i]
+      }
+    }
+    if(typeof this.initOptions == 'function') {
+      this.initOptions()
+    }
     if(!this._opts.template) return
-    let str = this._parseTempate(this._opts.template.trim(), data),
+    this.destroy();
+    let compile = _.template(this._opts.template.trim(),{ variable:'data'}),
         div = document.createElement('div'),
         parentNode = this.get('parentNode') || document.body
-    div.innerHTML = str
+    div.innerHTML = compile(this._opts)
     let currentNode = div.childNodes[0]
     parentNode.replaceChild(currentNode, this.get('_renderNodes'))
     this.set('_renderNodes', currentNode)
-    div = null 
+    div = null
+    //替换元素后，要重新委托自定义事件
+    if(this.events) {
+      this._delegateEvent();
+    }
   },
   //事件绑定
   //bind(){
@@ -159,30 +156,39 @@ export var base = Event.extend({
   render(data){
     this.set('_renderData', data)
     if(! this._opts.template)  return
-    let str = this._parseTempate(this._opts.template.trim(), data),
+    let compile = _.template(this._opts.template.trim(), {variable:'data'}),
         div = document.createElement('div'),
         parentNode = this.get('parentNode') || document.body
-    div.innerHTML = str
+    div.innerHTML = compile(this._opts)
     let currentNode = div.childNodes[0]
     this.set('_renderNodes', currentNode)
     parentNode.appendChild(currentNode)
     div = null
   },
-  //销毁组件注册的监听者、事件和保存的已渲染节点
+  //销毁组件注册的事件
   destroy(){
     //off all event listeners
-    this.off()
-    this.set('_renderNodes', null)
+//    this.off()
+//    this.set('_renderNodes', null)
     if(this.events) {
+      var events = this.events,
+          currentNode = this.get('_renderNodes'),
+          node = currentNode ? currentNode : this._opts.parentNode,
+          tag = node.tagName,
+          cldss =node.getAttribute('class');
+      if(tag !== 'body') {
+        selector = tag.toLowerCase()
+                   + ( cldss ? '.' + cldss : '')
+      }
       for(let e in events) {
-        let nodes = this.parentNode.querySelectorAll(e),
-            lens = nodes.length,
-            i = 0
+        let nodes = document.querySelectorAll(selector + ' ' + e),
+           lens = nodes.length,
+            i = 0;
         if(lens) {
           for(; i < lens; i++) {
             let types = events[e]
             for(let type in types) {
-              removeEvent(nodes[i], type, types[type])
+              event.removeEvent(nodes[i], type, types[type])
             }
           }
         }
